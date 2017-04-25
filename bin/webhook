@@ -1,0 +1,7 @@
+require 'puppet_webhook'
+require 'webrick'
+require 'webrick/https'
+
+Rack::Handler::WEBrick.run(Puppet::Webhook::Server, opts) do |server|
+  [:INT, :TERM].each { |sig| trap(sig) { server.stop } }
+end
