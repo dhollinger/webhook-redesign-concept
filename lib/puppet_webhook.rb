@@ -1,1 +1,0 @@
-require 'puppet_webhook/version'

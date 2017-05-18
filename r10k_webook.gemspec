@@ -11,8 +11,8 @@ Gem::Specification.new do |spec|
   spec.platform    = Gem::Platform::RUBY
   spec.author      = ['Vox Pupuli']
   spec.email       = ['support@voxpupuli.org']
-  spec.summary     = 'Sinatra-based webhook for use with Puppet'
-  spec.description = 'Sinatra-based webhook for use with Puppet. This webhook
+  spec.summary     = 'Sinatra-based webhook_old.rb for use with Puppet'
+  spec.description = 'Sinatra-based webhook_old.rb for use with Puppet. This webhook_old.rb
                         contains default endpoints for deploying environments
                         and modules with r10k, but can be extended to include
                         additional endpoints.'
