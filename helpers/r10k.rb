@@ -1,8 +1,9 @@
 module WebhookR10k
+  @config = WEBHOOK_CONFIG
   def deploy_module(module_name)
     begin
-      if $config['use_mcollective']
-        command = "#{$command_prefix} mco r10k deploy_module #{module_name} #{$config['mco_arguments']}"
+      if @config['use_mcollective']
+        command = "#{$command_prefix} mco r10k deploy_module #{module_name} #{@config['mco_arguments']}"
       else
         # If you don't use mcollective then this hook needs to be running as r10k's user i.e. root
         command = "#{$command_prefix} r10k deploy module #{module_name}"
@@ -23,7 +24,7 @@ module WebhookR10k
 
   def deploy(branch)
     begin
-      if $config['use_mco_ruby']
+      if @config['use_mco_ruby']
         result = mco(branch).first
         if result.results[:statuscode] == 0
           message = result.results[:statusmsg]
@@ -31,11 +32,11 @@ module WebhookR10k
           raise result.results[:statusmsg]
         end
       else
-        if $config['use_mcollective']
-          command = "#{$command_prefix} mco r10k deploy #{branch} #{$config['mco_arguments']}"
+        if @config['use_mcollective']
+          command = "#{$command_prefix} mco r10k deploy #{branch} #{@config['mco_arguments']}"
         else
           # If you don't use mcollective then this hook needs to be running as r10k's user i.e. root
-          command = "#{$command_prefix} r10k deploy environment #{branch} #{$config['r10k_deploy_arguments']}"
+          command = "#{$command_prefix} r10k deploy environment #{branch} #{@config['r10k_deploy_arguments']}"
         end
         message = run_command(command)
       end
@@ -54,10 +55,10 @@ module WebhookR10k
 
   def mco(branch)
     options =  MCollective::Util.default_options
-    options[:config] = $config['client_cfg']
+    options[:config] = @config['client_cfg']
     client = rpcclient('r10k', :exit_on_failure => false,:options => options)
-    client.discovery_timeout = $config['discovery_timeout']
-    client.timeout           = $config['client_timeout']
+    client.discovery_timeout = @config['discovery_timeout']
+    client.timeout           = @config['client_timeout']
     result = client.send('deploy',{:environment => branch})
   end # end mco()
 
@@ -73,7 +74,7 @@ module WebhookR10k
 
   def normalize(str)
     # one could argue that r10k should do this along with the other normalization it does...
-    $config['allow_uppercase'] ? str : str.downcase
+    @config['allow_uppercase'] ? str : str.downcase
   end
 
 end

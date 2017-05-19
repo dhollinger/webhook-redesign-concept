@@ -46,5 +46,8 @@ ENV['PUPPET_VERSION'].nil? ? puppetversion = '~> 4.0' : puppetversion = ENV['PUP
 gem 'puppet', puppetversion, :require => false, :groups => [:test]
 
 gem 'slack-notifier'
+gem 'sinatra', '~> 1.0'
+gem 'mcollective-client'
+
 
 # vim: syntax=ruby

@@ -4,9 +4,10 @@ require 'rack'
 require 'shellwords'
 
 module WebhookMain
+  @config = WEBHOOK_CONFIG
   # Ignore environments that we don't care about e.g. feature or bugfix branches
   def ignore_env?(env)
-    list = $config['ignore_environments']
+    list = @config['ignore_environments']
     return false if list.nil? or list.empty?
 
     list.each do |l|
@@ -27,7 +28,7 @@ module WebhookMain
     # Explicitly ignore GitHub ping events
     return true if request.env['HTTP_X_GITHUB_EVENT'] == 'ping'
 
-    list  = $config['repository_events']
+    list  = @config['repository_events']
     event = request.env['HTTP_X_GITHUB_EVENT']
 
     # negate this, because we should respond if any of these conditions are true
@@ -61,23 +62,23 @@ module WebhookMain
       $logger.error("Authentication failure from IP #{request.ip}")
       throw(:halt, [401, "Not authorized\n"])
     else
-      $logger.info("Authenticated as user #{$config['user']} from IP #{request.ip}")
+      $logger.info("Authenticated as user #{@config['user']} from IP #{request.ip}")
     end
   end  #end protected!
 
   def authorized?
     @auth ||=  Rack::Auth::Basic::Request.new(request.env)
     @auth.provided? && @auth.basic? && @auth.credentials &&
-        @auth.credentials == [$config['user'],$config['pass']]
+        @auth.credentials == [@config['user'],@config['pass']]
   end  #end authorized?
 
   def verify_signature(payload_body)
-    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), $config['github_secret'], payload_body)
+    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), @config['github_secret'], payload_body)
     throw(:halt, [500, "Signatures didn't match!\n"]) unless Rack::Utils.secure_compare(signature, request.env['HTTP_X_HUB_SIGNATURE'])
   end
 
   def run_prefix_command(payload)
-    IO.popen($config['prefix_command'], mode='r+') do |io|
+    IO.popen(@config['prefix_command'], mode='r+') do |io|
       io.write payload.to_s
       io.close_write
       begin

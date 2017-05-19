@@ -2,7 +2,7 @@ module WebhookSlack
   @config = WEBHOOK_CONFIG
   
   def notify_slack(status_message)
-    if config['slack_channel']
+    if @config['slack_channel']
       slack_channel = @config['slack_channel']
     else
       slack_channel = '#default'
